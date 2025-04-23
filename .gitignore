@@ -1,0 +1,6 @@
+/.cache/
+/.clangd
+/CMakeLists.txt
+/a.out
+/build/
+/compile_commands.json
