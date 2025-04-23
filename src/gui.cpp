@@ -1,3 +1,4 @@
+#include "../include/gui.hpp"
 #include "../include/simulation.hpp"
 #include <SDL.h>
 #include "imgui.h"
