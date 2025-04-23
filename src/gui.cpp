@@ -24,7 +24,7 @@ void render_simulation() {
 
     // Draw visualization background
     ImGui::Begin("Simulation Visualization");
-    ImDrawList* draw_list = ImGui::GetWinowDrawList();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
     ImVec2 origin = ImGui::GetCursorScreenPos();
     ImVec2 center = ImVec2(origin.x + 200, origin.y + 200);
 
@@ -62,7 +62,7 @@ void run_gui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-    ImGui_ImplSDLRenderer_Init(renderer);
+    ImGui_ImplSDLRenderer2_Init(renderer);
 
     while (running) {
         SDL_Event event;
@@ -71,7 +71,7 @@ void run_gui() {
             ImGui_ImplSDL2_ProcessEvent(&event);
         }
 
-        ImGui_ImplSDLRenderer_NewFrame();
+        ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
@@ -80,12 +80,12 @@ void run_gui() {
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
         SDL_RenderPresent(renderer);
         SDL_Delay(16); // ~60 FPS
     }
 
-    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
     SDL_DestroyRenderer(renderer);
