@@ -22,7 +22,7 @@ This project uses CMake to compile, ensure it and the sdl dev librar is installe
 sudo apt install cmake libsdl2-dev
 ```
 
-Build the project and run
+Starting from the root folder, build the project and run
 ```bash
 mkdir build && cd build
 cmake ..
