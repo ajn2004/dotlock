@@ -37,13 +37,8 @@ void MicroscopeSim::print_state() const {
 void MicroscopeSim::step(const Vec2& action) {
   // Update dot with Brownian motion
   dot_pos = add(dot_pos, random_step(dot_std));
-    
-  // Update stage with control and its own drift
-  Vec2 drift = random_step(stage_drift_std);
-  Vec2 move = scale(action, motor_speed);
-  stage_pos = add(stage_pos, move);
-  dot_pos = subtract(dot_pos, move);
-  }
+  dot_pos = add(dot_pos, scale(action, motor_speed));
+}
   
 // Compute reward (negative distance)
 double MicroscopeSim::reward() const {

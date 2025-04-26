@@ -47,6 +47,7 @@ set(APP_SOURCES
   src/main.cpp
   src/simulation.cpp
   src/gui.cpp
+  src/feedback.cpp
 )
 
 add_executable(dotlock ${APP_SOURCES} ${IMGUI_SOURCES})
