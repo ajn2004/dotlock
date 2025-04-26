@@ -1,5 +1,6 @@
 #include "../include/gui.hpp"
 #include "../include/simulation.hpp"
+#include "../include/feedback.hpp"
 #include <SDL.h>
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -10,49 +11,78 @@ SDL_Renderer* renderer = nullptr;
 bool running = true;
 
 MicroscopeSim sim;
+PID pid_feedback;
 Vec2 action = {0.0, 0.0};
+Vec2 target = {0.0, 0.0};
 bool use_feedback = false;
 bool use_pid = true;
 
+void paritcle_visualize(){
+  // Draw visualization background
+  ImGui::Begin("Simulation Visualization");
+  ImDrawList* draw_list = ImGui::GetWindowDrawList();
+  ImVec2 origin = ImGui::GetCursorScreenPos();
+  ImVec2 center = ImVec2(origin.x + 200, origin.y + 200);
+  
+  float scale = 100.0f;
+  ImVec2 dot(center.x + sim.dot_pos[0]*scale, center.y - sim.dot_pos[1]*scale);
+
+  draw_list->AddCircle(dot, 5.0f, IM_COL32(255, 255, 0, 255));
+  ImGui::Dummy(ImVec2(400, 400));
+  ImGui::End();
+}
+
+void main_side_panel(){
+  // Side panel
+  ImGui::Begin("Readout");
+  ImGui::Text("Particle Location\n x: %.3f\n y: %.3f", sim.dot_pos[0], sim.dot_pos[1]);
+  ImGui::Separator();
+  ImGui::Text("Reward\n current: %.4f", sim.reward());
+  ImGui::Separator();
+  ImGui::Text("Desired Location");
+  ImGui::InputDouble("x", &target[0], 2, 20, "%.3f");
+  ImGui::InputDouble("y", &target[1], 2, 20, "%.3f");
+  ImGui::Separator();
+  if (ImGui::Button(use_pid ? "PID (on)" : "PPO (off)", ImVec2(200, 40))) {
+    use_pid = !use_pid;
+  }
+  if (ImGui::Button(use_feedback ? "Disable Feedback" : "Enable Feedback", ImVec2(200, 40))) {
+    use_feedback = !use_feedback;
+  }
+  ImGui::End();
+}
+
+void pid_control_panel(){
+  ImGui::Begin("PID-Panel");
+  ImGui::Text("Weight variables: ");
+  ImGui::InputDouble("Kp", &pid_feedback.kp, 1, 10, "%.3f");
+  ImGui::InputDouble("Ki", &pid_feedback.ki, 0.01f, 0.1f, "%.3f");
+  ImGui::InputDouble("Kd", &pid_feedback.kd, 0.1f, 0.1f, "%.3f");
+  ImGui::End();
+}
 void render_simulation() {
     // Simulate step
     if (use_feedback) {
         // Placeholder PID: Move toward dot
-        Vec2 error = subtract(sim.dot_pos, sim.stage_pos);
-        action = scale(error, 0.1);  // crude proportional term
+      if(use_pid){
+	action = pid_feedback.compute(target, sim.dot_pos);
+      }
+      else{
+	   action = basic_feedback(target, sim.dot_pos);
+      }
     }
     sim.step(action);
-
+    action = {0.0, 0.0};
     // Draw visualization background
-    ImGui::Begin("Simulation Visualization");
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    ImVec2 origin = ImGui::GetCursorScreenPos();
-    ImVec2 center = ImVec2(origin.x + 200, origin.y + 200);
-
-    float scale = 100.0f;
-    ImVec2 dot(center.x + sim.dot_pos[0]*scale, center.y - sim.dot_pos[1]*scale);
-    ImVec2 stage(center.x + sim.stage_pos[0]*scale, center.y - sim.stage_pos[1]*scale);
-
-    draw_list->AddCircle(dot, 5.0f, IM_COL32(255, 255, 0, 255));
-    draw_list->AddCircle(stage, 7.0f, IM_COL32(0, 255, 0, 255), 0, 2.0f);
-    ImGui::Dummy(ImVec2(400, 400));
-    ImGui::End();
+    paritcle_visualize();
 
     // Side panel
-    ImGui::Begin("Readout");
-    ImGui::Text("Particle Location\n x: %.3f\n y: %.3f", sim.dot_pos[0], sim.dot_pos[1]);
-    ImGui::Separator();
-    ImGui::Text("Reward\n current: %.4f", sim.reward());
-    ImGui::Separator();
-    ImGui::Text("Desired Location\n x: 0\n y: 0");
-    ImGui::Separator();
-    if (ImGui::Button(use_pid ? "PID (on)" : "PPO (off)", ImVec2(200, 40))) {
-        use_pid = !use_pid;
+    main_side_panel();
+
+    // PID control
+    if(use_pid){
+      
     }
-    if (ImGui::Button(use_feedback ? "Disable Feedback" : "Enable Feedback", ImVec2(200, 40))) {
-        use_feedback = !use_feedback;
-    }
-    ImGui::End();
 }
 
 void run_gui() {
