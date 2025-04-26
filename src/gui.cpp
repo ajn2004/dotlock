@@ -1,5 +1,5 @@
-#include "../include/gui.hpp"
 #include "../include/simulation.hpp"
+#include "../include/gui.hpp"
 #include <SDL.h>
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -8,18 +8,19 @@
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 bool running = true;
+bool use_feedback = false;
+bool use_pid = false;
 
 MicroscopeSim sim;
 Vec2 action = {0.0, 0.0};
-bool use_feedback = false;
-bool use_pid = true;
+Vec2 target = {1.0, 0.0};
 
 void render_simulation() {
     // Simulate step
     if (use_feedback) {
         // Placeholder PID: Move toward dot
-        Vec2 error = subtract(sim.dot_pos, sim.stage_pos);
-        action = scale(error, 0.1);  // crude proportional term
+      Vec2 error = subtract(sim.dot_pos, target);
+        action = scale(error, -3);  // crude proportional term
     }
     sim.step(action);
 
@@ -34,7 +35,7 @@ void render_simulation() {
     ImVec2 stage(center.x + sim.stage_pos[0]*scale, center.y - sim.stage_pos[1]*scale);
 
     draw_list->AddCircle(dot, 5.0f, IM_COL32(255, 255, 0, 255));
-    draw_list->AddCircle(stage, 7.0f, IM_COL32(0, 255, 0, 255), 0, 2.0f);
+    // draw_list->AddCircle(stage, 7.0f, IM_COL32(0, 255, 0, 255), 0, 2.0f);
     ImGui::Dummy(ImVec2(400, 400));
     ImGui::End();
 
