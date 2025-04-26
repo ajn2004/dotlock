@@ -22,12 +22,12 @@ Vec2 PID::compute(const Vec2& target, const Vec2& actual){
 
     error_history.push_back(error);
     if (error_history.size()>30){ error_history.pop_front();};
-    return scale(add(P, add(I, D)), -1);
+    return scale(add(P, add(I, D)), 1);
   }
 }
 
 Vec2 basic_feedback(Vec2 &target, Vec2 &actual) {
-  Vec2 error = subtract(actual, target);
+  Vec2 error = subtract(target, actual);
   Vec2 correction = scale(error, 1);
   return correction;
 }

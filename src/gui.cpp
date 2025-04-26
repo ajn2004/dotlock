@@ -5,6 +5,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
+#include <iostream>
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -15,7 +16,7 @@ PID pid_feedback;
 Vec2 action = {0.0, 0.0};
 Vec2 target = {0.0, 0.0};
 bool use_feedback = false;
-bool use_pid = true;
+bool use_pid = false;
 
 void paritcle_visualize(){
   // Draw visualization background
@@ -24,7 +25,7 @@ void paritcle_visualize(){
   ImVec2 origin = ImGui::GetCursorScreenPos();
   ImVec2 center = ImVec2(origin.x + 200, origin.y + 200);
   
-  float scale = 100.0f;
+  float scale = 10.0f;
   ImVec2 dot(center.x + sim.dot_pos[0]*scale, center.y - sim.dot_pos[1]*scale);
 
   draw_list->AddCircle(dot, 5.0f, IM_COL32(255, 255, 0, 255));
@@ -68,7 +69,8 @@ void render_simulation() {
 	action = pid_feedback.compute(target, sim.dot_pos);
       }
       else{
-	   action = basic_feedback(target, sim.dot_pos);
+	action = basic_feedback(target, sim.dot_pos);
+	std::cout << action[0] << "\n\n";
       }
     }
     sim.step(action);
@@ -81,7 +83,7 @@ void render_simulation() {
 
     // PID control
     if(use_pid){
-      
+      pid_control_panel();
     }
 }
 
