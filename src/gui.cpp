@@ -70,7 +70,6 @@ void render_simulation() {
       }
       else{
 	action = basic_feedback(target, sim.dot_pos);
-	std::cout << action[0] << "\n\n";
       }
     }
     sim.step(action);
