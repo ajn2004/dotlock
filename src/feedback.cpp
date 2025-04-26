@@ -26,6 +26,15 @@ Vec2 PID::compute(const Vec2& target, const Vec2& actual){
   }
 }
 
+void PID::reset(){
+  PID new_pid;
+  kp = new_pid.kp;
+  ki = new_pid.ki;
+  kd = new_pid.kd;
+  integral = new_pid.integral;
+  error_history = new_pid.error_history;
+}
+
 Vec2 basic_feedback(Vec2 &target, Vec2 &actual) {
   Vec2 error = subtract(target, actual);
   Vec2 correction = scale(error, 1);

@@ -68,8 +68,11 @@ void main_side_panel(){
   if (ImGui::Button(use_feedback ? "Disable Feedback" : "Enable Feedback", ImVec2(200, 40))) {
     use_feedback = !use_feedback;
   }
-  if (ImGui::Button(use_feedback ? "Reset Position" : "Reset Position", ImVec2(200, 40))) {
+  if (ImGui::Button(use_feedback ? "Reset Sim" : "Reset Sim", ImVec2(200, 40))) {
     sim.reset();
+    pid_feedback.reset();
+    use_feedback = false;
+    use_pid = false;
   }
   ImGui::End();
 }
