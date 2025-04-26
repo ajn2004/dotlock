@@ -25,14 +25,14 @@ void paritcle_visualize(){
   ImGui::Begin("Simulation Visualization");
   ImDrawList* draw_list = ImGui::GetWindowDrawList();
   ImVec2 origin = ImGui::GetCursorScreenPos();
-  ImVec2 center = ImVec2(origin.x + 200, origin.y + 200);
+  ImVec2 center = ImVec2(origin.x + 300, origin.y + 300);
   
   float scale = 10.0f;
   ImVec2 dot(center.x + sim.dot_pos[0]*scale, center.y - sim.dot_pos[1]*scale);
 
   draw_list->AddCircle(dot, 5.0f, IM_COL32(255, 255, 0, 255));
   // mouse tracking
-  ImGui::InvisibleButton("canvas", ImVec2(400,400));
+  ImGui::InvisibleButton("canvas", ImVec2(600,600));
   if (ImGui::IsItemHovered()){
     ImVec2 mouse_pos = ImGui::GetIO().MousePos;
     ImVec2 relative = ImVec2(mouse_pos.x - center.x, center.y - mouse_pos.y);
@@ -54,14 +54,22 @@ void main_side_panel(){
   ImGui::Text("Reward\n current: %.4f", sim.reward());
   ImGui::Separator();
   ImGui::Text("Desired Location");
-  ImGui::InputDouble("x", &target[0], 2, 20, "%.3f");
-  ImGui::InputDouble("y", &target[1], 2, 20, "%.3f");
+  ImGui::InputDouble("x", &text_target[0], 2, 20, "%.3f");
+  ImGui::InputDouble("y", &text_target[1], 2, 20, "%.3f");
+  ImGui::Text("Random Drift Parameters");
+  ImGui::InputDouble("sigma", &sim.dot_std, 0.1, 1, "%.3f");
   ImGui::Separator();
+  ImGui::Text("Deterministic Drift Parameters");
+  ImGui::InputDouble("Radius", &sim.radius, 2, 20, "%.2f");
+  ImGui::InputDouble("Frequency", &sim.frequency, 10, 100, "%.1f");
   if (ImGui::Button(use_pid ? "PID (on)" : "PPO (off)", ImVec2(200, 40))) {
     use_pid = !use_pid;
   }
   if (ImGui::Button(use_feedback ? "Disable Feedback" : "Enable Feedback", ImVec2(200, 40))) {
     use_feedback = !use_feedback;
+  }
+  if (ImGui::Button(use_feedback ? "Reset Position" : "Reset Position", ImVec2(200, 40))) {
+    sim.reset();
   }
   ImGui::End();
 }

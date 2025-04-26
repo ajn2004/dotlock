@@ -18,8 +18,6 @@ Vec2 subtract(const Vec2& a, const Vec2& b) {
   return {a[0] - b[0], a[1] - b[1]};
 }
 
-
-
 Vec2 scale(const Vec2& v, double scalar) {
   return {v[0] * scalar, v[1] * scalar};
 }
@@ -35,8 +33,14 @@ void MicroscopeSim::print_state() const {
 }
   // Simulate one step
 void MicroscopeSim::step(const Vec2& action) {
+  time += dt;
   // Update dot with Brownian motion
   dot_pos = add(dot_pos, random_step(dot_std));
+  // add deterministic drift
+  Vec2 det_drift = {cos(2*M_PI/frequency*time), sin(2*M_PI/frequency*time)};
+  dot_pos = add(dot_pos, scale(det_drift, radius));
+
+  // correct dot position
   dot_pos = add(dot_pos, scale(action, motor_speed));
 }
   
@@ -44,4 +48,8 @@ void MicroscopeSim::step(const Vec2& action) {
 double MicroscopeSim::reward() const {
   return -norm(subtract(dot_pos, stage_pos));
 }
-  
+
+void MicroscopeSim::reset(){
+  time = 0.0;
+  dot_pos = {0.0, 0.0};
+}
