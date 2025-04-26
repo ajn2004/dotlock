@@ -5,6 +5,9 @@
 using Vec2 = std::array<double, 2>;
 double norm(const Vec2 &v);
 
+// bool use_feedback = false;
+// bool use_pid = true;
+
 Vec2 add(const Vec2 &a, const Vec2 &b);
 Vec2 subtract(const Vec2& a, const Vec2& b);
 Vec2 scale(const Vec2 &v, double scalar);

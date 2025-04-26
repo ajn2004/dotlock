@@ -18,6 +18,8 @@ Vec2 subtract(const Vec2& a, const Vec2& b) {
   return {a[0] - b[0], a[1] - b[1]};
 }
 
+
+
 Vec2 scale(const Vec2& v, double scalar) {
   return {v[0] * scalar, v[1] * scalar};
 }
@@ -39,8 +41,9 @@ void MicroscopeSim::step(const Vec2& action) {
   // Update stage with control and its own drift
   Vec2 drift = random_step(stage_drift_std);
   Vec2 move = scale(action, motor_speed);
-  stage_pos = add(stage_pos, add(drift, move));
-}
+  stage_pos = add(stage_pos, move);
+  dot_pos = subtract(dot_pos, move);
+  }
   
 // Compute reward (negative distance)
 double MicroscopeSim::reward() const {
