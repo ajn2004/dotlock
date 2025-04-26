@@ -12,10 +12,13 @@ bool running = true;
 
 MicroscopeSim sim;
 PID pid_feedback;
+Vec2 text_target = {0.0, 0.0};
+Vec2 mouse_target = {0.0, 0.0};
 Vec2 target = {0.0, 0.0};
 Vec2 action = {0.0, 0.0};
 bool use_feedback = false;
 bool use_pid = false;
+bool mouse_active = false;
 
 void paritcle_visualize(){
   // Draw visualization background
@@ -28,7 +31,18 @@ void paritcle_visualize(){
   ImVec2 dot(center.x + sim.dot_pos[0]*scale, center.y - sim.dot_pos[1]*scale);
 
   draw_list->AddCircle(dot, 5.0f, IM_COL32(255, 255, 0, 255));
-  ImGui::Dummy(ImVec2(400, 400));
+  // mouse tracking
+  ImGui::InvisibleButton("canvas", ImVec2(400,400));
+  if (ImGui::IsItemHovered()){
+    ImVec2 mouse_pos = ImGui::GetIO().MousePos;
+    ImVec2 relative = ImVec2(mouse_pos.x - center.x, center.y - mouse_pos.y);
+
+    mouse_target = {relative.x / scale, relative.y / scale};
+    mouse_active = true;
+  }
+  else{
+    mouse_active = false;
+  }
   ImGui::End();
 }
 
@@ -64,6 +78,8 @@ void render_simulation() {
     // Simulate step
     if (use_feedback) {
         // Placeholder PID: Move toward dot
+      if(mouse_active){	target = mouse_target;}
+      else{target = text_target;}
       if(use_pid){
 	action = pid_feedback.compute(target, sim.dot_pos);
       }
