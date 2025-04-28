@@ -2,6 +2,7 @@
 #include "../include/gui.hpp"
 #include "../include/feedback.hpp"
 #include <SDL.h>
+#include <string>
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
@@ -9,12 +10,11 @@
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 bool running = true;
-
+int episode_counter = 0;
 MicroscopeSim sim;
 PID pid_feedback;
 Vec2 text_target = {0.0, 0.0};
 Vec2 mouse_target = {0.0, 0.0};
-Vec2 target = {0.0, 0.0};
 Vec2 action = {0.0, 0.0};
 bool use_feedback = false;
 bool use_pid = false;
@@ -69,8 +69,10 @@ void main_side_panel(){
   }
   if (ImGui::Button(use_feedback ? "Disable Feedback" : "Enable Feedback", ImVec2(200, 40))) {
     use_feedback = !use_feedback;
+    if (use_feedback){sim.time = 0.0;}
+    if (!use_feedback){sim.write_log("trajectory_episode_" + std::to_string(episode_counter++) + ".txt");};
   }
-  if (ImGui::Button(use_feedback ? "Reset Sim" : "Reset Sim", ImVec2(200, 40))) {
+  if (ImGui::Button("Reset Sim", ImVec2(200, 40))) {
     sim.reset();
     pid_feedback.reset();
     use_feedback = false;
@@ -91,16 +93,17 @@ void render_simulation() {
     // Simulate step
     if (use_feedback) {
         // Placeholder PID: Move toward dot
-      if(mouse_active){	target = mouse_target;}
-      else{target = text_target;}
+      if(mouse_active){	sim.tar_pos = mouse_target;}
+      else{sim.tar_pos = text_target;}
       if(use_pid){
-	action = pid_feedback.compute(target, sim.dot_pos);
+	action = pid_feedback.compute(sim.tar_pos, sim.dot_pos);
       }
       else{
-	action = basic_feedback(target, sim.dot_pos);
+	action = basic_feedback(sim.tar_pos, sim.dot_pos);
       }
     }
     sim.step(action);
+    if (use_feedback){sim.log_step(action);}
     action = {0.0, 0.0};
     // Draw visualization background
     paritcle_visualize();
