@@ -50,6 +50,5 @@ double MicroscopeSim::reward() const {
 }
 
 void MicroscopeSim::reset(){
-  time = 0.0;
-  dot_pos = {0.0, 0.0};
+  *this = MicroscopeSim();
 }

@@ -56,8 +56,10 @@ void main_side_panel(){
   ImGui::Text("Desired Location");
   ImGui::InputDouble("x", &text_target[0], 2, 20, "%.3f");
   ImGui::InputDouble("y", &text_target[1], 2, 20, "%.3f");
-  ImGui::Text("Random Drift Parameters");
+  ImGui::Separator();
+  ImGui::Text("Simulation Parameters");
   ImGui::InputDouble("sigma", &sim.dot_std, 0.1, 1, "%.3f");
+  ImGui::InputDouble("Motor Speed", &sim.motor_speed, 0.1, 0.1, "%.3f");
   ImGui::Separator();
   ImGui::Text("Deterministic Drift Parameters");
   ImGui::InputDouble("Radius", &sim.radius, 2, 20, "%.2f");
